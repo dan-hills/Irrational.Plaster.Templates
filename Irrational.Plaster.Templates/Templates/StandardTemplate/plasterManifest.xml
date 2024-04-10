@@ -1,0 +1,127 @@
+﻿<?xml version = "1.0" encoding = "utf-8"?>
+<plasterManifest
+        schemaVersion = "1.2"
+        templateType  = "Project" xmlns = "http://www.microsoft.com/schemas/PowerShell/Plaster/v1">
+        <metadata>
+                <name>StandardTemplate</name>
+                <id>09edcf88-87e4-4a56-8e67-233cd912e6f4</id>
+                <version>1.0.0</version>
+                <title>StandardTemplate</title>
+                <description>A minimal Powershell module</description>
+                <author>dan-hills</author>
+                <tags>Core</tags>
+        </metadata>
+        <parameters>
+                <!-- Prompt User for Required Parameters -->
+                <parameter 
+                        name   = 'ModuleName'
+                        type   = 'text'
+                        prompt = 'Enter the name of the module' />
+
+                <parameter 
+                        name   = 'ModuleDescrip'
+                        type   = 'text'
+                        prompt = 'A brief desription for this module' />
+
+                <!-- Parameters with default values -->
+                <parameter 
+                        name    = 'FullName'
+                        type    = 'user-fullname'
+                        default = '${ENV:USERNAME}'
+                        prompt  = 'Author of the module'
+                        store   = 'text' />
+
+                <!-- Provide a single parameter option -->
+                <parameter 
+                        name    = 'PowershellVersion'
+                        type    = 'Choice'
+                        default = '0'
+                        store   = 'text'
+                        prompt  = 'Supported Powershell Versions'>
+
+                        <!-- Available Options: &amp; indicates the highlighted letter -->
+                        <choice 
+                                label = '&amp;5.1'
+                                help  = 'Used for managing logs and log files with some irrationality'
+                                value = "5.1" />
+
+                        <choice 
+                                label = '&amp;7.0'
+                                help  = 'Used for managing logs and log files rationally'
+                                value = "7" />
+                </parameter>
+
+
+        </parameters>
+
+        <content>
+                <!-- Create the Module Manifest -->
+                <newModuleManifest
+                        destination       = '${PLASTER_PARAM_ModuleName}\${PLASTER_PARAM_ModuleName}.psd1'
+                        moduleVersion     = '0.0.1'
+                        description       = '$PLASTER_PARAM_ModuleDescrip'
+                        rootModule        = '${PLASTER_PARAM_ModuleName}.psm1'
+                        companyName       = 'Irrational Shibas'
+                        author            = '${PLASTER_PARAM_FullName}'
+                        encoding          = 'UTF8-NoBOM'
+                        powershellVersion = '${PLASTER_PARAM_PowershellVersion}'
+                        openInEditor      = "true" />
+
+                <!-- Create Files Based on Conditional Options -->
+                <file 
+                        condition   = '${PLASTER_PARAM_Options} -contains "Build"'
+                        source      = 'src\build.ps1'
+                        destination = 'build.ps1' />
+
+                <file 
+                        condition   = '${PLASTER_PARAM_Options} -contains "Build"'
+                        source      = 'src\psake.ps1'
+                        destination = 'psake.ps1' />
+
+                <file 
+                        condition   = '${PLASTER_PARAM_Options} -contains "Build"'
+                        source      = 'src\deploy.psdeploy.ps1'
+                        destination = 'deploy.ps1' />
+
+                <!-- Templated file settings -->
+                <templateFile 
+                        source      = 'src\Module.psm1'
+                        destination = '${PLASTER_PARAM_ModuleName}\${PLASTER_PARAM_ModuleName}.psm1' />
+
+                <templateFile 
+                        source      = 'src\README.md'
+                        destination = 'README.md' />
+
+                <templateFile 
+                        source      = 'src\RELEASENOTES.md'
+                        destination = 'RELEASENOTES.md' />
+
+                <templateFile 
+                        condition   = '${PLASTER_PARAM_Options} -contains "Pester"'
+                        source      = 'src\tests\Module.T.ps1'
+                        destination = 'tests\${PLASTER_PARAM_ModuleName}.Tests.ps1' />
+
+                <templateFile 
+                        source      = 'src\en-us\about_Module.help.txt'
+                        destination = '${PLASTER_PARAM_ModuleName}\en-us\about_${PLASTER_PARAM_ModuleName}.help.txt' />
+
+                <templateFile 
+                        source      = 'src\README.md'
+                        destination = 'docs\about_${PLASTER_PARAM_ModuleName}.md' />
+
+                <templateFile 
+                        source      = 'src\config.psd1'
+                        destination = 'config.psd1' />
+
+                <requireModule 
+                        name           = "Pester"
+                        condition      = '${PLASTER_PARAM_Options} -contains "Pester"'
+                        minimumVersion = "5.5.0"
+                        message        = "Pester 5.5.0 has been recommended for this module" />
+
+                <message>
+                        Your new PowerShell module project '$PLASTER_PARAM_ModuleName' has been
+                        created.
+                </message>
+        </content>
+</plasterManifest>

@@ -1,0 +1,168 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<plasterManifest
+      schemaVersion="1.1"
+      templateType="Item" xmlns="http://www.microsoft.com/schemas/PowerShell/Plaster/v1">
+      <metadata>
+            <name>PlasterTemplate-General</name>
+            <id>1ba3a76f-6f14-4548-831e-f17af33bed5a</id>
+            <version>0.0.1</version>
+            <title>PlasterTemplate-General</title>
+            <description>This manifest template is designed to scaffold module folders and files using dotsourcing</description>
+            <tags>Core</tags>
+      </metadata>
+      <parameters>
+
+            <!-- Prompt User for Required Parameters -->
+            <parameter 
+                  name   = 'ModuleName'
+                  type   = 'text'
+                  prompt = 'Enter the name of the module' />
+
+            <parameter 
+                  name   = 'ModuleDescrip'
+                  type   = 'text'
+                  prompt = 'A brief desription for this module' />
+
+            <!-- Parameters with default values -->
+            <parameter 
+                  name    = 'FullName'
+                  type    = 'user-fullname'
+                  default = '${ENV:USERNAME}'
+                  prompt  = 'Author of the module'
+                  store   = 'text' />
+
+            <!-- Provide a single parameter option -->
+            <parameter 
+                  name    = 'PowershellVersion'
+                  type    = 'choice'
+                  default = '0'
+                  store   = 'text'
+                  prompt  = 'Supported Powershell Versions'>
+
+                  <choice label = '&amp;5.1'
+                        help  = 'Used for managing logs and log files with some irrationality'
+                        value = "5.1" />
+
+                  <choice label = '&amp;7.0'
+                        help  = 'Used for managing logs and log files rationally'
+                        value = "7" />
+            </parameter>
+
+            <!-- Additional build settings files -->
+            <parameter 
+                  name    = 'Options'
+                  type    = 'multichoice'
+                  default = '0,1'
+                  store   = 'text'
+                  prompt  = 'Select desired options'>
+
+                  <choice label = '&amp;Pester test support'
+                              help  = "Adds Tests directory and a starter Pester Tests file."
+                              value = "Pester"/>
+
+                  <choice label = '&amp;GitHub'
+                              help  = "Adds Github configuration files"
+                              value = "Github"/>
+
+                  <choice label = '&amp;VSCode Development Settings'
+                              help  = "Includes additional VSCode development configuration files"
+                              value = "vscode"/>
+
+                  <choice label = '&amp;CI Build Settings'
+                              help  = "Adds a PSake build script that generates the module directory for publishing to the PSGallery."
+                              value = "Build"/>
+
+                  <choice label = '&amp;None'
+                              help  = "No options specified."
+                              value = "None"/>
+            </parameter>
+      </parameters>
+
+      <content>
+            <message>&#10;&#10;Scaffolding your PowerShell Module...&#10;&#10;&#10;</message>
+            <file source = '' destination = '${PLASTER_PARAM_ModuleName}\bin'/>
+            <file source = '' destination = '${PLASTER_PARAM_ModuleName}\classes'/>
+            <file source = '' destination = '${PLASTER_PARAM_ModuleName}\demo'/>
+            <file source = '' destination = 'docs'/>
+            <file source = '' destination = '${PLASTER_PARAM_ModuleName}\en-us'/>
+            <file source = '' destination = '${PLASTER_PARAM_ModuleName}\formats'/>
+            <file source = '' destination = '${PLASTER_PARAM_ModuleName}\lib'/>
+            <file source = '' destination = '${PLASTER_PARAM_ModuleName}\private'/>
+            <file source = '' destination = '${PLASTER_PARAM_ModuleName}\public'/>
+            <file source = '' destination = '${PLASTER_PARAM_ModuleName}\scripts'/>
+
+            <file source      = 'src\format.ps1xml' 
+                  destination = '${PLASTER_PARAM_ModuleName}\formats\format.ps1xml' />
+
+            <file source      = 'src\vscode\powershell.code-snippets'
+                  destination = '.vscode\powershell.code-snippets' />
+
+            <newModuleManifest 
+                  destination       = '${PLASTER_PARAM_ModuleName}\${PLASTER_PARAM_ModuleName}.psd1'
+                  moduleVersion     = '0.0.1'
+                  description       = '$PLASTER_PARAM_ModuleDescrip'
+                  rootModule        = '${PLASTER_PARAM_ModuleName}.psm1'
+                  companyName       = 'Irrational Shibas'
+                  author            = '${PLASTER_PARAM_FullName}'
+                  encoding          = 'UTF8-NoBOM'
+                  openInEditor      = "true"/>
+
+            <!-- Conditional File Settings -->
+            <file condition   = '${PLASTER_PARAM_Options} -contains "Build"'
+                  source      = 'src\build.ps1'
+                  destination = 'build.ps1'  />
+            
+            <file condition   = '${PLASTER_PARAM_Options} -contains "Build"'
+                  source      = 'src\psake.ps1'
+                  destination = 'psake.ps1'  />
+
+            <file condition   = '${PLASTER_PARAM_Options} -contains "Build"'
+                  source      = 'src\deploy.psdeploy.ps1'
+                  destination = 'deploy.ps1'  />
+                  
+            <file condition   = '${PLASTER_PARAM_Options} -contains "Github"'
+                  source      = 'src\.gitignore'
+                  destination = '.gitignore'  />
+
+
+            <!-- Templated file settings -->
+            <templateFile 
+                  source      = 'src\Module.psm1'
+                  destination = '${PLASTER_PARAM_ModuleName}\${PLASTER_PARAM_ModuleName}.psm1' />
+
+            <templateFile 
+                  source      = 'src\README.md'
+                  destination = 'README.md'/>
+
+            <templateFile 
+                  source      = 'src\RELEASENOTES.md'
+                  destination = 'RELEASENOTES.md' />
+
+            <templateFile 
+                  condition   = '${PLASTER_PARAM_Options} -contains "Pester"'
+                  source      = 'src\tests\Module.T.ps1'
+                  destination = 'tests\${PLASTER_PARAM_ModuleName}.Tests.ps1' />
+
+            <templateFile 
+                  source      = 'src\en-us\about_Module.help.txt'
+                  destination = '${PLASTER_PARAM_ModuleName}\en-us\about_${PLASTER_PARAM_ModuleName}.help.txt' />
+
+            <templateFile 
+                  source      = 'src\README.md'
+                  destination = 'docs\about_${PLASTER_PARAM_ModuleName}.md'/>
+
+            <templateFile 
+                  source      = 'src\config.psd1'
+                  destination = 'config.psd1' />
+
+            <requireModule 
+                  name           = "Pester"
+                  condition      = '${PLASTER_PARAM_Options} -contains "Pester"'
+                  minimumVersion = "5.5.0"
+                  message        = "Pester 5.5.0 has been recommended for test development with this module"/>
+
+            <message>
+                  Your new PowerShell module project '$PLASTER_PARAM_ModuleName' has been created.
+            </message>
+      </content>
+</plasterManifest>

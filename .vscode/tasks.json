@@ -1,0 +1,41 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "Invoke Plaster Script",
+            "type": "shell",
+            "command": "pwsh",
+            "args": [
+                "-Command",
+                "Invoke-Plaster -TemplatePath ${input:TemplatePath} -DestinationPath ${input:DestinationPath}"
+            ],
+            "problemMatcher": [],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            }
+        }
+    ],
+    "inputs": [
+        {
+            "id": "TemplatePath",
+            "type": "pickString",
+            "description": "Enter the output path for the new repository",
+            "options": [
+                {
+                    "label": "AdvancedTemplate",
+                    "value": "${workspaceFolder}/templates/AdvancedTemplate/"
+                },
+                {
+                    "label": "BasicTemplate",
+                    "value": "${workspaceFolder}/templates/BasicTemplate/"
+                }
+            ]
+        },
+        {
+            "id": "DestinationPath",
+            "type": "promptString",
+            "description": "Enter the path to the Plaster template"
+        }
+    ]
+}
